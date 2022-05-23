@@ -1,0 +1,15 @@
+{
+  "name": "unitestingtask",
+  "version": "0.0.1",
+  "description": "Unit testing task",
+  "scripts": {
+    "test": "jest --coverage"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "coverageReporters": ["json", "html"]
+  },
+  "dependencies": {
+    "jest": "^28.1.0"
+  }
+}
