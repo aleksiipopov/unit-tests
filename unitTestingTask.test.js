@@ -1,27 +1,15 @@
 const unitTestingTask = require('./unitTestingTask');
 
-function handleValue (value) {
-  if (value.length === 1) {
-    return `0${value}`;
-  }
-  return `${value}`;
-}
+const selectDay = new Date(2011, 0, 1, 13, 3, 4, 3);
 
-function handleValueForMS (value) {
-  if (value.length === 1) {
-    return `00${value}`;
-  }
-  if (value.length === 2) {
-    return `0${value}`;
-  }
-  return `${value}`;
-}
+beforeAll(() => {
+  jest.useFakeTimers('modern');
+  jest.setSystemTime(selectDay);
+})
 
-function formatHoursTo12(date) {
-  return date.getHours() % 12 || 12;
-}
-
-const selectDay = new Date(2011, 0, 1, 12, 3, 4,);
+afterAll(() => {
+  jest.useRealTimers();
+});
 
 describe('unitTestingTask', () => {
 
@@ -34,67 +22,68 @@ describe('unitTestingTask', () => {
   describe('formate of time', () => {
   
     it('year', () => {
-      const testDate = new Date(2002, 0, 1)
-      expect(unitTestingTask('YYYY', selectDay)).toBe(selectDay.getFullYear().toString());
-      expect(unitTestingTask('YY', selectDay)).toBe(selectDay.getFullYear().toString().substr(-2));
-      expect(unitTestingTask('YY', testDate)).toBe(testDate.getFullYear().toString().substr(-2));
+      const testDate = new Date(2002, 0, 1);
+      expect(unitTestingTask('YYYY')).toBe('2011');
+      expect(unitTestingTask('YY')).toBe('11');
+      expect(unitTestingTask('YY', testDate)).toBe('02');
     })
     
     it('month', () => {
-      const testDate = new Date (2011, 23, 11)
-      expect(unitTestingTask('MMMM', selectDay)).toBe(selectDay.toLocaleString('local', { month: 'long' }));
-      expect(unitTestingTask('MMM', selectDay)).toBe(selectDay.toLocaleString('local', {month: 'short'}));
-      expect(unitTestingTask('M', selectDay)).toBe((selectDay.getMonth() + 1).toString())
-      expect(unitTestingTask('MMMM', testDate)).toBe(testDate.toLocaleString('local', { month: 'long' }));
-      expect(unitTestingTask('MMM', testDate)).toBe(testDate.toLocaleString('local', {month: 'short'}));
-      expect(unitTestingTask('M', testDate)).toBe((testDate.getMonth() + 1).toString())
+      const testDate = new Date (2011, 23, 11);
+      expect(unitTestingTask('MMMM')).toBe('January');
+      expect(unitTestingTask('MMM')).toBe('Jan');
+      expect(unitTestingTask('M')).toBe('1')
+      expect(unitTestingTask('MMMM', testDate)).toBe('December');
+      expect(unitTestingTask('MMM', testDate)).toBe('Dec');
+      expect(unitTestingTask('M', testDate)).toBe('12')
     })
   
     it('day of week', () => {
-      expect(unitTestingTask('DDD', selectDay)).toBe(selectDay.toLocaleDateString('local', { weekday: 'long' }));
-      expect(unitTestingTask('DD', selectDay)).toBe(selectDay.toLocaleDateString('local', { weekday: 'short' }));
-      expect(selectDay.toLocaleDateString('local', { weekday: 'long' })).toContain(unitTestingTask('D', selectDay));
+      expect(unitTestingTask('DDD')).toBe('Saturday');
+      expect(unitTestingTask('DD')).toBe('Sat');
+      expect('Sa').toBe(unitTestingTask('D'));
     })
   
     it('day of month', () => {
-      expect(unitTestingTask('dd', selectDay)).toHaveLength(2)
-      expect(unitTestingTask('dd', selectDay)).toBe(handleValue(selectDay.getDate().toString()));
-      expect(unitTestingTask('d', selectDay)).toBe(selectDay.getDate().toString());
+      expect(unitTestingTask('dd')).toHaveLength(2)
+      expect(unitTestingTask('dd')).toBe('01');
+      expect(unitTestingTask('d')).toBe('1');
     })
   
     it('hours', () => {
       const testDate = new Date(2011, 0, 1, 8, 3, 4,);
-      expect(unitTestingTask('HH', selectDay)).toHaveLength(2);
-      expect(unitTestingTask('HH', selectDay)).toBe(handleValue(selectDay.getHours().toString()));
-      expect(unitTestingTask('HH', testDate)).toBe(handleValue(testDate.getHours().toString()));
-      expect(unitTestingTask('hh', selectDay)).toHaveLength(2);
-      expect(unitTestingTask('hh', selectDay)).toBe(handleValue(formatHoursTo12(selectDay).toString()));
-      expect(unitTestingTask('h', selectDay)).toBe(formatHoursTo12(selectDay).toString());
+      expect(unitTestingTask('HH')).toHaveLength(2);
+      expect(unitTestingTask('HH')).toBe('13');
+      expect(unitTestingTask('HH', testDate)).toBe('08');
+      expect(unitTestingTask('H', testDate)).toBe('8');
+      expect(unitTestingTask('hh')).toHaveLength(2);
+      expect(unitTestingTask('hh')).toBe('01');
+      expect(unitTestingTask('h')).toBe('1');
     })
     
     it('minutes', () => {
-      expect(unitTestingTask('mm', selectDay)).toHaveLength(2);
-      expect(unitTestingTask('mm', selectDay)).toBe(handleValue(selectDay.getMinutes().toString()));
-      expect(unitTestingTask('m', selectDay)).toBe(selectDay.getMinutes().toString());
+      expect(unitTestingTask('mm')).toHaveLength(2);
+      expect(unitTestingTask('mm')).toBe('03');
+      expect(unitTestingTask('m')).toBe('3');
     })
     
     it('seconds', () => {
-      expect(unitTestingTask('ss', selectDay)).toHaveLength(2);
-      expect(unitTestingTask('ss', selectDay)).toBe(handleValue(selectDay.getSeconds().toString()));
-      expect(unitTestingTask('s', selectDay)).toBe(selectDay.getSeconds().toString());
+      expect(unitTestingTask('ss')).toHaveLength(2);
+      expect(unitTestingTask('ss')).toBe('04');
+      expect(unitTestingTask('s')).toBe('4');
     })
     
     it('seconds', () => {
-      expect(unitTestingTask('ff', selectDay)).toHaveLength(3);
-      expect(unitTestingTask('ff', selectDay)).toBe(handleValueForMS(selectDay.getMilliseconds().toString()));
-      expect(unitTestingTask('f', selectDay)).toBe(selectDay.getMilliseconds().toString());
+      expect(unitTestingTask('ff')).toHaveLength(3);
+      expect(unitTestingTask('ff')).toBe('003');
+      expect(unitTestingTask('f')).toBe('3');
     })
   
     it('AM/PM or am/pm', () => {
       const testDate = new Date(2011, 0, 1, 2, 3, 4,);
-      expect(unitTestingTask('A', selectDay)).toBe(selectDay.getHours() < 12 ? 'AM' : 'PM');
-      expect(unitTestingTask('a', selectDay)).toBe(selectDay.getHours() < 12 ? 'am' : 'pm');
-      expect(unitTestingTask('a', testDate)).toBe(testDate.getHours() < 12 ? 'am' : 'pm');
+      expect(unitTestingTask('A')).toBe('PM');
+      expect(unitTestingTask('a')).toBe('pm');
+      expect(unitTestingTask('a', testDate)).toBe('am');
     })
   
     it('AM/PM or am/pm', () => {
@@ -112,13 +101,18 @@ describe('unitTestingTask', () => {
   });
 
     it('default en lang', () => {
-      const lang = 'en';
-      unitTestingTask.lang(lang)
-      expect(unitTestingTask._languages.current).toBe(lang);
+      unitTestingTask.lang('en')
+      expect(unitTestingTask._languages.current).toBe('en');
+      unitTestingTask.lang('be', 'cs')
+      unitTestingTask.lang('kk')
+      expect(unitTestingTask._languages.current).toBe('be');
     });
 
     it('formatters', () => {
-      expect(unitTestingTask('ISODate', selectDay)).toBe('2011-01-01')
+      unitTestingTask.register('myFormat', 'YY-M-dd, h:mm')
+      expect(unitTestingTask('myFormat')).toBe('11-1-01, 1:03')
+      expect(unitTestingTask('myFormat')).toBe(unitTestingTask('YY-M-dd, h:mm', new Date()))
+      expect(unitTestingTask('ISODate')).toBe('2011-01-01')
     })
 
 });
